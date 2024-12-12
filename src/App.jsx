@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import ProfileSinglePage from "./pages/ProfileSinglePage";
 import { useFirebase } from "../firebase/Firebase";
 import LoginSignpage from "./components/LoginSignpage";
+import { EditProfile } from "./components/EditProfile";
 
 function App() {
   const firebase = useFirebase();
@@ -21,6 +22,7 @@ function App() {
 
           <Route path="/login&signup" element={<LoginSignpage />} />
           <Route path="/userProfile/:id" element={<ProfileSinglePage />} />
+          <Route path="/edituserprofile/:id" element={<EditProfile/>}></Route>
         </Routes>
       </div>
     </>

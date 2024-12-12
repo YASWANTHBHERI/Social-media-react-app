@@ -2,18 +2,20 @@ import { useEffect, useState } from "react";
 import { LuImagePlus } from "react-icons/lu";
 import { useFirebase } from "../../firebase/Firebase";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 function ProfileSinglePage() {
   const firebase = useFirebase();
-  const { fetchAllUsersPosts,name } = useFirebase();
+  const { fetchAllUsersPosts,fetchCurrentUserProfile } = useFirebase();
   const [accountPostedImages, setAccountPostedImages] = useState([]);
+  const navigate = useNavigate();
 
-  let [userName, setUserName] = useState(name);
+  const [userData,setUserData] = useState([]);
 
-  const handleUserName = (currname) =>{
-    setUserName(()=>userName = currname);
-  }
-
+  const handleEditProfile = () => {
+    const userId = firebase.userId; // Replace with the actual user ID from Firebase or your app logic
+    navigate(`/edituserprofile/${userId}`);
+  };
 
   useEffect(() => {
     const fetchAndLogPosts = async () => {
@@ -46,23 +48,42 @@ function ProfileSinglePage() {
     fetchAndLogPosts();
   }, [fetchAllUsersPosts]);
 
+
+  //fetchin user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const data = await fetchCurrentUserProfile();
+        console.log("Fetched user profile data:", data);
+        setUserData(()=>data)
+      
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [fetchCurrentUserProfile]);
+
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="w-full bg-black/10 p-3 flex items-center justify-center flex-col gap-3">
+    <div className="w-full  bg-white p-3 flex items-center justify-center flex-col gap-3">
       <span className="w-full lg:w-11/12 flex items-center justify-center relative">
         {!firebase.url ? (
           <img
             src="/user.png"
-            alt=""
+            alt="default image"
             className="w-full h-96 object-contain rounded-2xl overflow-hidden shadow-md relative"
           />
         ) : (
           <img
-            src={firebase.url}
-            alt=""
+            src={userData.profileURL}
+            alt="userprofile"
+            onError={(e) => (e.target.src = '/user.png')}
             className="w-full h-96 object-cover rounded-2xl overflow-hidden shadow-md relative"
           />
         )}
@@ -71,11 +92,12 @@ function ProfileSinglePage() {
           <img
             src="/user.png"
             alt=""
+            onError={(e) => (e.target.src = '/user.png')}
             className="w-36 h-36 absolute left-0 bg-black -bottom-20 border-8 border-gray-700 rounded-full object-cover"
           />
         ) : (
           <img
-            src={firebase.url}
+            src={userData.profileURL}
             alt=""
             className="w-36 h-36 absolute left-0  -bottom-20 border-8 border-gray-700 rounded-full object-cover"
           />
@@ -91,32 +113,19 @@ function ProfileSinglePage() {
       </span>
       {/* edit profile */}
       <div className="relative lg:w-8/12">
-        <button className="border-2 border-gray-700 rounded-full py-1 px-5 hover:bg-green-400 font-semibold">
+        <button
+          className="border-2 border-gray-700 rounded-full py-1 px-5 hover:bg-green-400 font-semibold"
+          onClick={handleEditProfile}
+        >
           Edit Profile
         </button>
       </div>
 
       {/* display profile */}
       <div className="relative lg:w-11/12 top-8">
-      <div className="hiddenInput flex gap-2">
-      <input
-          type="text"
-          id="fname"
-          name="fname"
-          className="bg-transparent px-4 py-1 border-b-2 border-red-500 focus:outline-none focus:ring-0"
-          placeholder="Enter your name"
-          value={userName}
-          onChange={(e)=>handleUserName(e.target.value)}
-        />
-        <div className="self-end">
-          <button className="py-1 px-5 bg-green-800 font-semibold rounded-lg text-white">Update</button>
-        </div>
+      <h1 className="text-lg font-semibold">{userData.userName}</h1>
+      <h2>{userData.bio}</h2>    
         
-      </div>
-        
-
-        <h1 className="text-lg font-semibold">Name</h1>
-        <h2 className="text-md font-semibold">Bio</h2>
       </div>
 
       {/* posts */}

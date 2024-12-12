@@ -15,6 +15,9 @@ import {
   addDoc,
   getDocs,
   doc,
+  setDoc,
+  getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -55,20 +58,22 @@ export const FirebaseProvider = ({ children }) => {
     signInWithEmailAndPassword(firebaseAuth, email, password);
 
   // google login
-  const signinWithGoogle = () =>
-    //signInWithRedirect(firebaseAuth, GoogleProvider);
+  const signinWithGoogle = () => {
     signInWithPopup(firebaseAuth, GoogleProvider);
+    handleGoogleSignIn();
+  };
+  //signInWithRedirect(firebaseAuth, GoogleProvider);
 
   // check user login or not
 
   const signOutUser = async () => {
     try {
       await signOut(firebaseAuth); // Sign out the user
-      setUser(null); // Reset user state
-      setName("user"); // Reset name
-      setEmail(null); // Reset email
-      setUrl(null); // Reset profile picture URL
-      setUserId(null); // Reset user ID
+      setUser(null); 
+      setName("user"); 
+      setEmail(null); 
+      setUrl(null);
+      setUserId(null);
       console.log("User signed out successfully");
     } catch (error) {
       console.error("Error signing out: ", error);
@@ -77,10 +82,76 @@ export const FirebaseProvider = ({ children }) => {
 
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) setUser(user);
-      else setUser(null);
+      if (user) {
+        setUser(user);
+        saveUsers(user);
+        //fetchCurrentUserProfile();
+      } else setUser(null);
     });
   }, []);
+
+
+
+  const saveUsers = async (user) => {
+    try {
+      const userCollectionRef = collection(firestore, "users");
+      const userDocRef = doc(userCollectionRef, user.uid);
+
+      const userSnapshot = await getDoc(userDocRef);
+      if (userSnapshot.exists()) {
+        console.log("User already exists in Firestore, skipping save.");
+        return;
+      }
+      // Set the user's data
+      await setDoc(userDocRef, {
+        userId: user.uid,
+        userName: user.displayName || "Anonymous",
+        email: user.email,
+        profileURL: user.photoURL || "",
+        createdAt: new Date().toISOString(),
+        bio: "I am a FrontEnd Developer",
+      });
+
+      console.log("User saved successfully in Firestore!");
+    } catch (error) {
+      console.error("Error saving user to Firestore:", error);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const userCredential = await signinWithGoogle(); // Google sign-in
+      const user = userCredential.user; // Extract the user object
+      await saveUsers(user); // Save the user's data in Firestore
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  // fectch current user profile
+  const fetchCurrentUserProfile = async () => {
+    try {
+      if (!user) {
+        console.log("No user is currently logged in.");
+        return null;
+      }
+
+      const userDocRef = doc(firestore, "users", user.uid); // Reference the user document by UID
+      const userSnapshot = await getDoc(userDocRef); // Fetch the document
+
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data(); // Extract user data
+        console.log("Fetched current user data:", userData);
+        return userData; // Return user data
+      } else {
+        console.log("No user data found for the current user.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching current user data:", error);
+      throw error;
+    }
+  };
 
   const isLoggedIn = user ? true : false;
 
@@ -103,18 +174,24 @@ export const FirebaseProvider = ({ children }) => {
   };
 
   // edit profile
-  const editProfile = async (name,bio,profilePic,coverPhoto) =>{
-    const userProfileDocRef = doc(firestore, "userProfile", user.uid);
-    const userProfileCollectionRef = collection(userProfileDocRef);
-    const addProfileRef = await addDoc(userProfileCollectionRef,{
-      userUid:user.uid,
-      name:name,
-      bio:bio,
-      profilePic:profilePic,
-      coverPhoto:coverPhoto,
-    });
-    return addProfileRef;
-  }
+  const updateUserProfile = async ({ bio, profileURL, userName }) => {
+    try {
+      const userProfileDocRef = doc(firestore, "users", user.uid);
+
+      // Update specific fields in the document
+      await updateDoc(userProfileDocRef, {
+        userName: userName,
+        bio: bio,
+        profileURL: profileURL,
+        updatedAt: new Date(),
+      });
+      
+      console.log("User profile updated successfully");
+      return updateDoc;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  };
 
   // create user post data
   const handleCreatePost = async (disc, cover) => {
@@ -132,18 +209,22 @@ export const FirebaseProvider = ({ children }) => {
       useEmail: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
-      userUid:user.uid,
+      userUid: user.uid,
     });
     return postDocRef;
   };
 
-  
   // Fetching posts collection
   const fetchAllUsersPosts = async () => {
     try {
-      const postsCollectionRef = collection(firestore, "posts", user.uid, "userPosts"); // Accessing the userPosts sub-collection
+      const postsCollectionRef = collection(
+        firestore,
+        "posts",
+        user.uid,
+        "userPosts"
+      ); // Accessing the userPosts sub-collection
       const snapshot = await getDocs(postsCollectionRef);
-  
+
       if (!snapshot.empty) {
         const posts = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -158,7 +239,6 @@ export const FirebaseProvider = ({ children }) => {
       console.error("Error fetching posts:", error);
     }
   };
-  
 
   const addAllUsersPost = async (disc, cover) => {
     try {
@@ -178,7 +258,7 @@ export const FirebaseProvider = ({ children }) => {
         useEmail: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        userUid:user.uid,
+        userUid: user.uid,
       });
 
       console.log("Post added to allUsersPosts with ID:", postDocRef.id);
@@ -203,8 +283,6 @@ export const FirebaseProvider = ({ children }) => {
   const getImageURL = (path) => {
     return getDownloadURL(ref(storage, path));
   };
-
-  
 
   useEffect(() => {
     DisplayName();
@@ -239,6 +317,8 @@ export const FirebaseProvider = ({ children }) => {
         userId,
         fetchAllUsersPosts,
         addAllUsersPost,
+        fetchCurrentUserProfile,
+        updateUserProfile,
       }}
     >
       {children}
