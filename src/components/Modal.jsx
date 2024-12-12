@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import NewpostUploader from "./NewpostUploader";
+import {NewpostUploader} from "./NewpostUploader";
 
 export const Modal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,11 +27,11 @@ export const Modal = () => {
 
               {/* Modal body */}
               <div className="p-5 flex justify-center">
-                <NewpostUploader/>
+                <NewpostUploader handleClose={handleClose}/>
               </div>
 
               {/* Modal footer */}
-              <div className="flex items-center justify-end p-2 md:p-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+              {/* <div className="flex items-center justify-end p-2 md:p-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                 
                 <button
                   onClick={handleClose}
@@ -39,7 +39,7 @@ export const Modal = () => {
                 >
                   Close
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

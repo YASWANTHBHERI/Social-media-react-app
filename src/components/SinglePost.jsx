@@ -53,7 +53,7 @@ function SinglePost(props) {
               // eslint-disable-next-line react/prop-types
               src="/user.png"
               alt="userPic"
-              className="lg:w-10 lg:h-10 w-8 h-8 rounded-2xl object-cover border-2 bg-gray-500 border-gray-500 cursor-pointer"
+              className="lg:w-10 lg:h-10 w-8 h-8 rounded-full object-cover border-2 bg-gray-500 border-gray-500 cursor-pointer"
               // eslint-disable-next-line react/prop-types
               onClick={() => navigate(`/userProfile/${props.userID}`)}
             />
@@ -61,8 +61,9 @@ function SinglePost(props) {
             <img
               // eslint-disable-next-line react/prop-types
               src={props.photoURL}
-              alt="userPic"
-              className="lg:w-10 lg:h-10 w-8 h-8 rounded-2xl object-cover border-2 border-gray-500 cursor-pointer"
+              alt="profilePic"
+              className="lg:w-10  rounded-full object-cover border-2 border-gray-500 cursor-pointer"
+              onError={(e) => (e.target.src = '/user.png')}
               // eslint-disable-next-line react/prop-types
               onClick={() => navigate(`/userProfile/${props.userID}`)}
             />
@@ -82,7 +83,7 @@ function SinglePost(props) {
         <span className="w-1/12  flex items-center justify-center">
           <BsThreeDotsVertical
             fontSize={22}
-            className="text-white cursor-pointer my-2 rotate-90"
+            className="text-black cursor-pointer my-2 rotate-90"
           />
         </span>
       </span>
@@ -107,8 +108,8 @@ function SinglePost(props) {
       </span>
       {/* like share */}
 
-      <div className="w-full flex items-center justify-between text-white px-5 my-1 py-3">
-        <AiOutlineHeart fontSize={19} className="mx-2 cursor-pointer" />
+      <div className="w-full flex items-center justify-between text-black px-5 my-1 py-3">
+        <span><AiOutlineHeart fontSize={19} className="mx-2 cursor-pointer"/></span>
         <div className="flex items-center justify-center bg-[#00000012] text-black font-bold rounded-lg px-3 py-1">
           <IoIosSend fontSize={19} className="cursor-pointer" />
           <span>Share</span>

@@ -8,8 +8,6 @@ function Post() {
 
   const firebase = useFirebase();
 
-
-
   useEffect(() => {
     firebase.listPost().then((post) => {
       setIsLoading(false);
@@ -52,7 +50,6 @@ function Post() {
   return (
     <div className="w-full lg:w-4/5  my-2  lg:px-3 py-2 flex items-center justify-center flex-col-reverse">
       {posts?.map((item) => {
-        
         return <SinglePost key={item.id} {...item.data()} id={item.id} />;
       })}
     </div>

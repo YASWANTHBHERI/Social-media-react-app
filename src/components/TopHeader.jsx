@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirebase } from "../../firebase/Firebase";
 
@@ -7,10 +7,29 @@ function TopHeader() {
   const firebase = useFirebase();
   const id = firebase.userId;
 
-  const { signOutUser } = useFirebase();
+  const { signOutUser,fetchCurrentUserProfile } = useFirebase();
   const handleLogout = () => {
     signOutUser();
   };
+
+  const [userName, setUserName] = useState("");
+  const [userProfilePic,setUserProfilePic] = useState("");
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const data = await fetchCurrentUserProfile();
+        console.log("Fetched user profile data:", data);
+        setUserName(data.userName || "");
+        setUserProfilePic(data.profileURL||"");
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [fetchCurrentUserProfile]);
 
   return (
     <div className="w-full lg:w-4/5 lg:px-3 py-2 flex items-start justify-center flex-col-reverse">
@@ -31,8 +50,9 @@ function TopHeader() {
             />
           ) : (
             <img
-              src={firebase.url}
+              src={userProfilePic}
               alt="userPic"
+              onError={(e) => (e.target.src = '/user.png')}
               className="object-cover rounded-full w-10"
             />
           )}
@@ -42,12 +62,12 @@ function TopHeader() {
         <div className="">
           <p className="text-xs text-gray-600">Welcome back</p>
           {!firebase.name ? (
-            <h2 className="text-md text-white font-semibold lg:flex hidden">
+            <h2 className="text-md text-white font-semibold lg:flex">
               {firebase.email}
             </h2>
           ) : (
-            <h2 className="text-md text-white font-semibold lg:flex hidden">
-              {firebase.name}
+            <h2 className="text-md text-black font-semibold lg:flex">
+              {userName}
             </h2>
           )}
           
