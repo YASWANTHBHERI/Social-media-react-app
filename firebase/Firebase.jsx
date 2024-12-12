@@ -36,7 +36,7 @@ export const useFirebase = () => useContext(firebaseContext);
 
 const FirebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(FirebaseApp);
-console.log(firebaseAuth);
+//console.log(firebaseAuth);
 const GoogleProvider = new GoogleAuthProvider();
 const firestore = getFirestore(FirebaseApp);
 const storage = getStorage(FirebaseApp);
@@ -74,7 +74,7 @@ export const FirebaseProvider = ({ children }) => {
       setEmail(null); 
       setUrl(null);
       setUserId(null);
-      console.log("User signed out successfully");
+      //console.log("User signed out successfully");
     } catch (error) {
       console.error("Error signing out: ", error);
     }
@@ -99,7 +99,7 @@ export const FirebaseProvider = ({ children }) => {
 
       const userSnapshot = await getDoc(userDocRef);
       if (userSnapshot.exists()) {
-        console.log("User already exists in Firestore, skipping save.");
+        //console.log("User already exists in Firestore, skipping save.");
         return;
       }
       // Set the user's data
@@ -112,7 +112,7 @@ export const FirebaseProvider = ({ children }) => {
         bio: "I am a FrontEnd Developer",
       });
 
-      console.log("User saved successfully in Firestore!");
+     // console.log("User saved successfully in Firestore!");
     } catch (error) {
       console.error("Error saving user to Firestore:", error);
     }
@@ -132,7 +132,7 @@ export const FirebaseProvider = ({ children }) => {
   const fetchCurrentUserProfile = async () => {
     try {
       if (!user) {
-        console.log("No user is currently logged in.");
+        //console.log("No user is currently logged in.");
         return null;
       }
 
@@ -141,10 +141,10 @@ export const FirebaseProvider = ({ children }) => {
 
       if (userSnapshot.exists()) {
         const userData = userSnapshot.data(); // Extract user data
-        console.log("Fetched current user data:", userData);
+       // console.log("Fetched current user data:", userData);
         return userData; // Return user data
       } else {
-        console.log("No user data found for the current user.");
+        //console.log("No user data found for the current user.");
         return null;
       }
     } catch (error) {
@@ -186,7 +186,7 @@ export const FirebaseProvider = ({ children }) => {
         updatedAt: new Date(),
       });
       
-      console.log("User profile updated successfully");
+      //console.log("User profile updated successfully");
       return updateDoc;
     } catch (error) {
       console.error("Error updating user profile:", error);
@@ -230,10 +230,10 @@ export const FirebaseProvider = ({ children }) => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("Fetched posts in firebase:", posts);
+       // console.log("Fetched posts in firebase:", posts);
         return posts;
       } else {
-        console.log("No documents found in userPosts sub-collection.");
+        //console.log("No documents found in userPosts sub-collection.");
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -248,7 +248,7 @@ export const FirebaseProvider = ({ children }) => {
         `uploads/images/${Date.now()}-${cover.name}`
       );
       const uploadResult = await uploadBytes(imageRef, cover);
-      console.log("Image uploaded successfully at:", uploadResult.ref.fullPath);
+     // console.log("Image uploaded successfully at:", uploadResult.ref.fullPath);
 
       // Add the post data to the 'allUsersPosts' collection in Firestore
       const postDocRef = await addDoc(collection(firestore, "allUsersPosts"), {
@@ -261,7 +261,7 @@ export const FirebaseProvider = ({ children }) => {
         userUid: user.uid,
       });
 
-      console.log("Post added to allUsersPosts with ID:", postDocRef.id);
+      //console.log("Post added to allUsersPosts with ID:", postDocRef.id);
       return postDocRef; // Return the document reference
     } catch (error) {
       console.error("Error adding post to allUsersPosts:", error);
@@ -272,10 +272,10 @@ export const FirebaseProvider = ({ children }) => {
   // set user post data
   const listPost = () => {
     // return getDocs(collection(firestore, "userUpload"));
-    console.log(
-      "allUsersPosts",
-      getDocs(collection(firestore, "allUsersPosts"))
-    );
+    // console.log(
+    //   "allUsersPosts",
+    //   getDocs(collection(firestore, "allUsersPosts"))
+    // );
     return getDocs(collection(firestore, "allUsersPosts"));
   };
 

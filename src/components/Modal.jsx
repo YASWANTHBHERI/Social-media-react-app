@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import {NewpostUploader} from "./NewpostUploader";
+import { Share } from "./Share";
 
 export const Modal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,7 @@ export const Modal = () => {
               {/* Modal body */}
               <div className="p-5 flex justify-center">
                 <NewpostUploader handleClose={handleClose}/>
+                
               </div>
 
               {/* Modal footer */}

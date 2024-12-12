@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaArrowLeftLong } from "react-icons/fa6";
 import { LuImagePlus } from "react-icons/lu";
 import { useFirebase } from "../../firebase/Firebase";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +55,7 @@ export const EditProfile=() => {
   return (
     <div className="w-full h-screen bg-white p-3 flex items-center flex-col gap-3">
       <span className="w-full lg:w-11/12 flex items-center justify-center relative">
+      <FaArrowLeftLong className="relative cursor-pointer self-start" onClick={()=>navigate(`/userProfile/${userId}`)} />
         {!firebase.url ? (
           <img
             src="/user.png"

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FaArrowLeftLong } from "react-icons/fa6";
 import { LuImagePlus } from "react-icons/lu";
 import { useFirebase } from "../../firebase/Firebase";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
@@ -72,19 +73,21 @@ function ProfileSinglePage() {
 
   return (
     <div className="w-full  bg-white p-3 flex items-center justify-center flex-col gap-3">
+      
       <span className="w-full lg:w-11/12 flex items-center justify-center relative">
+      <FaArrowLeftLong className="relative cursor-pointer self-start" onClick={()=>navigate(`/`)} />
         {!firebase.url ? (
           <img
             src="/user.png"
             alt="default image"
-            className="w-full h-96 object-contain rounded-2xl overflow-hidden shadow-md relative"
+            className="w-full h-96 object-contain overflow-hidden shadow-md relative"
           />
         ) : (
           <img
             src={userData.profileURL}
             alt="userprofile"
             onError={(e) => (e.target.src = '/user.png')}
-            className="w-full h-96 object-cover rounded-2xl overflow-hidden shadow-md relative"
+            className="w-full h-60 object-cover  overflow-hidden shadow-md relative"
           />
         )}
 

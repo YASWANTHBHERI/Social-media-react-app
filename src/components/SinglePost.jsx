@@ -5,6 +5,7 @@ import { IoIosSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useFirebase } from "../../firebase/Firebase";
+import { Share } from "./Share";
 
 function SinglePost(props) {
   const [url, setUrl] = useState("");
@@ -12,6 +13,8 @@ function SinglePost(props) {
   const currTime = new Date().toLocaleTimeString();
   const navigate = useNavigate();
   const firebase = useFirebase();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   //let hexColor = `#${Math.random().toString(16).slice(2,8).padEnd(6,0)}`;
   const hexColor = [
@@ -37,10 +40,13 @@ function SinglePost(props) {
     firebase.getImageURL(props.imageURL).then((url) => setUrl(url));
   }, [firebase, props]);
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div
       style={{ backgroundColor: colorGenerator() }}
-      className="w-full lg:px-4 py-2 my-3  rounded-3xl flex items-center justify-center flex-col"
+      className={`${props.id} w-full lg:px-4 py-2 my-3  rounded-3xl flex items-center justify-center flex-col`}
       // eslint-disable-next-line react/prop-types
       key={props.id}
     >
@@ -63,7 +69,7 @@ function SinglePost(props) {
               src={props.photoURL}
               alt="profilePic"
               className="lg:w-10  rounded-full object-cover border-2 border-gray-500 cursor-pointer"
-              onError={(e) => (e.target.src = '/user.png')}
+              onError={(e) => (e.target.src = "/user.png")}
               // eslint-disable-next-line react/prop-types
               onClick={() => navigate(`/userProfile/${props.userID}`)}
             />
@@ -109,12 +115,20 @@ function SinglePost(props) {
       {/* like share */}
 
       <div className="w-full flex items-center justify-between text-black px-5 my-1 py-3">
-        <span><AiOutlineHeart fontSize={19} className="mx-2 cursor-pointer"/></span>
-        <div className="flex items-center justify-center bg-[#00000012] text-black font-bold rounded-lg px-3 py-1">
-          <IoIosSend fontSize={19} className="cursor-pointer" />
+        <div className="flex items-center">
+          <AiOutlineHeart fontSize={19} className="likes mx-2 cursor-pointer" />
+          <span>0</span>
+        </div>
+        <div onClick={openModal} className="flex items-center justify-center bg-[#00000012] text-black font-bold rounded-lg px-3 py-1 cursor-pointer">
+          <IoIosSend fontSize={19} />
           <span>Share</span>
+  
         </div>
       </div>
+      {/* Modal */}
+      {isModalOpen && (
+        <Share handleClose={closeModal} copyUrl={"http://localhost:5173/userProfile/6ipYwR0Vl3Po0qlRuJ4kiGfrCkF2"}/>
+      )}
     </div>
   );
 }
